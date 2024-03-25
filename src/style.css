@@ -1,0 +1,33 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+.card {
+  position: absolute;
+  bottom: 0;
+  transform: translateY(0%);
+  transition: transform 0.3s ease-in-out;
+}
+
+@keyframes jumpAndRotate {
+  0% {
+    transform: translateY(0) scale(100%) rotate(0deg);
+  }
+  10% {
+    transform: translateY(-50px) scale(100%) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-350px) scale(90%) rotate(180deg);
+  }
+  90% {
+    transform: translateY(-50px) scale(90%) rotate(360deg);
+  }
+  100% {
+    transform: translateY(-39%) scale(90%) rotate(360deg);
+  }
+}
+
+.jump {
+  animation: jumpAndRotate 1s ease-in-out;
+}
