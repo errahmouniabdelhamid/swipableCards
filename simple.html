@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link rel="stylesheet" href="./src/style.css">
+    <script src="//unpkg.com/alpinejs" defer></script>
+    <script src="https://umanghome.github.io/swipe-listener/dist/swipe-listener.min.js"></script>
+</head>
+<body>
+
+
+<div class="bg-blue-400 p-6" x-data="Cards" @swiped.window="rearangeToasts">
+      <button @click="rearangeToasts" class="px-4 py-2 bg-blue-900 text-white rounded shadow-sm">
+        rearange
+      </button>
+      <div class="relative w-72 md:w-96 flex items-end w-full pt-96" >
+        <div class="flex cards-wrapper" x-ref="toastsWrapper">
+
+          <div class="w-72 md:w-96 h-48 shadow-xl rounded-md bg-white p-10 text-lg card space-y-2 swipable"  style="z-index: 0">
+            <div class="w-12 h-12 bg-gray-300 rounded-full"></div>
+            <div class="w-36 h-4 bg-gray-300 rounded-full"></div>
+            <div class="w-24 h-4 bg-gray-300 rounded-full"></div>
+          </div>
+
+          <div class="w-72 md:w-96 h-48 shadow-xl rounded-md bg-blue-700 p-10 text-lg card space-y-2 swipable"  style="z-index: 1">
+            <div class="w-12 h-12 bg-blue-400 rounded-full"></div>
+            <div class="w-36 h-4 bg-blue-400 rounded-full"></div>
+            <div class="w-24 h-4 bg-blue-400 rounded-full"></div>
+          </div>
+
+          <div class="w-72 md:w-96 h-48 shadow-xl rounded-md bg-red-700 p-10 text-lg card space-y-2 swipable"  style="z-index: 2">
+            <div class="w-12 h-12 bg-red-400 rounded-full"></div>
+            <div class="w-36 h-4 bg-red-400 rounded-full"></div>
+            <div class="w-24 h-4 bg-red-400 rounded-full"></div>
+          </div>
+
+        </div>
+
+        <div class="swipe-area absolute bottom-0 left-0 w-full h-48 z-50"></div>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("alpine:init", () => {
+        Alpine.data("Cards", () => ({
+
+          previousCard: null,
+          getTransformForPosition(i) {
+            i = this.$refs.toastsWrapper.children.length - 1 - i;
+            return `translateY(${1 - i * 20}%) scale(${(100 - 5 * i) / 100})`;
+          },
+          
+          rotateRight(arr) {
+            arr.unshift(arr.pop());
+            return arr;
+          },
+          
+          rearangeToasts() {
+            // Get all the card elements
+            const cards = document.querySelectorAll(".cards-wrapper .card");
+            // Calculate the new z-index for each card
+            cards.forEach((card, index) => {
+              if (card.style.zIndex === "2") {
+                this.previousCard?.classList.remove("jump");
+                card.classList.add("jump");
+                this.previousCard = card;
+              }
+            });
+
+            setTimeout(() => {
+              cards.forEach((card, index) => {
+                // Calculate the new z-index based on the current index
+                // This will rotate the z-index values in a circular manner
+                const newZIndex = (card.style.zIndex + 1) % cards.length;
+                // Apply the new z-index to the card
+                card.style.zIndex = newZIndex;               
+              });
+              this.pillToasts();
+            }, 500);
+          },
+          
+          pillToasts() {
+            Array.from(this.$refs.toastsWrapper.children).forEach((child) => {
+              child.style.transform = this.getTransformForPosition(
+                child.style.zIndex
+              );
+            });
+          },
+          
+          init() {
+            this.pillToasts();
+
+            let swipeArea = document.querySelector('.swipe-area');
+            var listener = SwipeListener(swipeArea); 
+            swipeArea.addEventListener('swipe', (e) => {
+                var dir = e.detail.directions;
+                var x = e.detail.x;
+                var y = e.detail.y;
+
+                if (dir.top) {
+                    this.rearangeToasts();
+                }
+            });
+          },
+        }));
+
+      });
+    </script>
+</body>
+</html>
